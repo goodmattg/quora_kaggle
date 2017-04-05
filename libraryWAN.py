@@ -9,7 +9,7 @@ from numpy import inf
 import functools
 
 
-# In[8]:
+# In[1]:
 
 def functionWordWAN(sentence, fwords_dict, window_size, alpha):
     wan = np.zeros((len(fwords_dict), len(fwords_dict)))
@@ -28,7 +28,7 @@ def functionWordWAN(sentence, fwords_dict, window_size, alpha):
     return wan
 
 
-# In[9]:
+# In[2]:
 
 def normalizeWAN(raw_wan, fwords_len):
     sums = raw_wan.sum(axis=1)
@@ -39,37 +39,53 @@ def normalizeWAN(raw_wan, fwords_len):
     return norm_wan
 
 
-# In[10]:
+# In[3]:
 
 def relativeEntropy(wan1, wan2):
     # Return is a list containing 1 w.r.t 2, then 2 w.r.t. 1
-    entropies = [0, 0]
-    
-    limiting1 = la.matrix_power(wan1, 25) # 25 selected as reasonable convergence value
-    limiting2 = la.matrix_power(wan2, 25)
-    
+    data = {}
+    data['entropies'] = [0.0, 0.0]
+    # 50 selected as reasonable convergence value
+    limiting1 = la.matrix_power(wan1, 50) 
+    limiting2 = la.matrix_power(wan2, 50)
+    # Store stationary distributions
+    data['l1'] = limiting1
+    data['l2'] = limiting2
     # 1 w.r.t 2
     imd = np.nan_to_num(np.divide(wan1,wan2)) # Set all nan's to zero (0/0)
-    imd[(imd == inf) | (imd == -inf)] = 0 # All infinities to 0 (scalar/0)
+    imd[(imd == inf) | (imd == -inf)] = 0 # All infinities to 0 (sc alar/0)
     log_imd = np.nan_to_num(np.log(imd))
     log_imd[(log_imd == inf) | (log_imd == -inf)] = 0    
     weights = functools.reduce(np.multiply, [limiting1, wan1, log_imd])
-    entropies[0] = sum(sum(weights))
-    
+    data['entropies'][0] = weights.sum()
     # 2 w.r.t 1
     imd = np.nan_to_num(np.divide(wan2,wan1)) # Set all nan's to zero (0/0)
     imd[(imd == inf) | (imd == -inf)] = 0 # All infinities to 0 (scalar/0)
     log_imd = np.nan_to_num(np.log(imd))
     log_imd[(log_imd == inf) | (log_imd == -inf)] = 0    
     weights = functools.reduce(np.multiply, [limiting2, wan2, log_imd])
-    entropies[1] = sum(sum(weights))
+    data['entropies'][1] = weights.sum()
     
-    return entropies
+    return data
 
 
-# In[ ]:
+# In[4]:
 
-
+def generateWANPair(snt1, snt2, window_size, alpha):
+    ret_data = {}
+    snt1_set = set(snt1)
+    snt2_set = set(snt2)
+    comp_set = snt1_set.union(snt2_set)
+    comp_dict = {}
+    # Generate the composite sentence dictionary
+    for idx, v in enumerate(comp_set):
+        comp_dict[v] = idx+1
+    
+    ret_data['snt1_wan'] = functionWordWAN(snt1, comp_dict, window_size, alpha)
+    ret_data['snt2_wan'] = functionWordWAN(snt2, comp_dict, window_size, alpha)
+    
+    return ret_data
+        
 
 
 # In[ ]:
