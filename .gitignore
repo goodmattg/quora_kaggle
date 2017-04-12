@@ -3,3 +3,5 @@
 *.pdf
 *.zip
 *.csv
+svm-light
+stanford-corenlp-full-2016-10-31
