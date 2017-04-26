@@ -1,0 +1,170 @@
+{
+  "Case": {
+    "A": {
+      "verb": {
+        "verb": [
+          {
+            "S": [
+              "purpcl",
+              "xcomp"
+            ],
+            "T": [
+              "purpcl",
+              "xcomp"
+            ]
+          }
+        ],
+        "noun": [
+          {
+            "S": [
+              "agent",
+              "nsubj",
+              "xsubj"
+            ],
+            "T": [
+              "agent",
+              "nsubj",
+              "xsubj"
+            ]
+          },
+          {
+            "S": [
+              "dobj",
+              "nsubjpass",
+              "rel"
+            ],
+            "T": [
+              "dobj",
+              "nsubjpass",
+              "rel"
+            ]
+          },
+          {
+            "S": [
+              "tmod",
+              "prep_in",
+              "prep_at",
+              "prep_on"
+            ],
+            "T": [
+              "tmod",
+              "prep_in",
+              "prep_at",
+              "prep_on"
+            ]
+          },
+          {
+            "S": [
+              "iobj",
+              "prep_to"
+            ],
+            "T": [
+              "iobj",
+              "prep_to"
+            ]
+          }
+        ]
+      },
+      "noun": {
+        "verb": [
+          {
+            "S": [
+              "infmod",
+              "partmod",
+              "rcmod"
+            ],
+            "T": [
+              "infmod",
+              "partmod",
+              "rcmod"
+            ]
+          }
+        ],
+        "noun": [
+          {
+            "S": [
+              "pos",
+              "nn",
+              "prep_of",
+              "prep_in",
+              "prep_at",
+              "prep_for"
+            ],
+            "T": [
+              "pos",
+              "nn",
+              "prep_of",
+              "prep_in",
+              "prep_at",
+              "prep_for"
+            ]
+          }
+        ],
+        "adjective": [
+          {
+            "S": [
+              "amod",
+              "rcmod"
+            ],
+            "T": [
+              "amod",
+              "rcmod"
+            ]
+          }
+        ]
+      }
+    },
+    "C": {
+      "verb": {
+        "verb": [
+          {
+            "S": "",
+            "T": ""
+          },
+          {
+            "S": "",
+            "T": ""
+          },
+          {
+            "S": "",
+            "T": ""
+          }
+        ],
+        "noun": [
+          {
+            "S": "",
+            "T": ""
+          }
+        ],
+        "adjective": [
+          {
+            "S": "",
+            "T": ""
+          }
+        ]
+      },
+      "noun": {
+        "noun": [
+          null,
+          {},
+          {}
+        ],
+        "adjective": []
+      },
+      "adjective": {
+        "adjective": [
+          null,
+          {},
+          {}
+        ]
+      },
+      "adverb": {
+        "adverb": [
+          null,
+          {},
+          {}
+        ]
+      }
+    }
+  }
+}
