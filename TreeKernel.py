@@ -42,15 +42,20 @@ def _cdHelper_(tree1, tree2, node1, node2, store, lam, SST_ON):
             # Not pre-terminal. Recurse among the children of both token trees.
             else:
                 nChildren = len(tree1[node1]['children'])
-                runningTotal = 0
+                
+                runningTotal = None
                 for idx in range(nChildren):
                      # index ->  node_id
                     tmp_n1 = tree1[node1]['children'][idx]
                     tmp_n2 = tree2[node2]['children'][idx]
                     # Recursively run helper
                     _cdHelper_(tree1, tree2, tmp_n1, tmp_n2, store, lam, SST_ON)
-                    runningTotal *= (SST_ON + store[tmp_n1, tmp_n2])
-
+                    # Set the initial value for the layer. Else multiplicative product.
+                    if (runningTotal == None):
+                        runningTotal = SST_ON + store[tmp_n1, tmp_n2]
+                    else:
+                        runningTotal *= (SST_ON + store[tmp_n1, tmp_n2])
+                    
                 store[node1, node2] = lam * runningTotal
                 return
         else:
@@ -58,6 +63,7 @@ def _cdHelper_(tree1, tree2, node1, node2, store, lam, SST_ON):
     else: # parent nodes are different
         store[node1, node2] = 0
         return
+
 
 def _cdKernel_(tree1, tree2, lam, SST_ON):
     # Fill the initial state of the store
