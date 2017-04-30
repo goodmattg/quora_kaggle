@@ -48,7 +48,7 @@ if __name__ == "__main__":
     block_ctr = 1
     count = 0
 
-    fout = gzip.open(sys.argv[2] + block_ctr + '.nlp', 'wb')
+    fout = gzip.open(sys.argv[2] + str(block_ctr) + '.nlp', 'wb')
 
     for row in dataframe.iterrows():
         try:
@@ -90,7 +90,7 @@ if __name__ == "__main__":
         except OSError:
             fout.close()
             block_ctr += 1
-            fout = gzip.open(sys.argv[2] + block_ctr + '.nlp', 'wb')
+            fout = gzip.open(sys.argv[2] + str(block_ctr) + '.nlp', 'wb')
             pickle.dump(tmp, fout, protocol=pickle.HIGHEST_PROTOCOL)
             tree_1.clear()
             tree_2.clear()
