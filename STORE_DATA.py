@@ -1,19 +1,11 @@
-
-# coding: utf-8
-
-# In[ ]:
-
 import pandas as pd
-from pycorenlp import StanfordCoreNLP 
+from pycorenlp import StanfordCoreNLP
 from math import ceil
 import TreeBuild as tb
 import pickle
 import json, os
-
-nlp = StanfordCoreNLP('http://localhost:9000')
-
-
-# In[ ]:
+import gzip
+import sys
 
 def read_data(path_to_file):
     df = pd.read_csv(path_to_file)
@@ -22,44 +14,43 @@ def read_data(path_to_file):
     print("Shape of base training data after cleaning = ", df.shape)
     return df
 
-df_train = read_data("input/train.csv")
-
-
-# In[ ]:
-
 def _getNLPToks_(rawSentence):
     try:
         output = nlp.annotate(rawSentence, properties={
-            'annotators': 'tokenize,ssplit,pos,parse,depparse',
+            'annotators': 'tokenize,ssplit,pos,parse,ner,depparse',
             'outputFormat': 'json'
         })
-    except UnicodeDecodeError:
-        print("HERE")
-        sentence = unidecode(rawSentence)
-        output = nlp.annotate(sentence, properties={
-            'annotators': 'tokenize,ssplit,pos,parse,depparse',
-            'outputFormat': 'json'
-        })
+    except:
+        print("Stanford NLP crash on row")
+        return
+
     if (isinstance(output, str)):
-        output = json.loads(output) # Convert str output to dict
-        
+        # output = json.loads(output) # Convert str output to dict
+        print("Error processing row. Attempt to strip % and quotes")
+        return _getNLPToks_(rawSentence.replace("%","").replace('"','').replace("'",''))
+
     dependencies = output['sentences'][0]['basicDependencies']
     tokens = output['sentences'][0]['tokens']
     parse = output['sentences'][0]['parse'].split("\n")
-    
+
     return {'deps':dependencies,
-            'toks':tokens, 
+            'toks':tokens,
             'parse':parse}
 
 
-if __name__ == "__main__":    
-    
-    block_ctr = 1        
+if __name__ == "__main__":
+
+    nlp = StanfordCoreNLP('http://localhost:9000')
+
+    # First argument is path to input dataframe
+    dataframe = pd.read_csv(sys.argv[1])
+
+    block_ctr = 1
     count = 0
 
-    fout = open('stanfordData_train' + block_ctr + '.nlp', 'wb') 
-      
-    for row in df_train.iterrows():
+    fout = gzip.open(sys.argv[2] + block_ctr + '.nlp', 'wb')
+
+    for row in dataframe.iterrows():
         try:
             q1_stanford = _getNLPToks_(row[1]['question1'])
             q2_stanford = _getNLPToks_(row[1]['question2'])
@@ -85,7 +76,7 @@ if __name__ == "__main__":
                     'raw': row[1]['question2'],
                     'toks': q2_stanford['toks'],
                     'deps': q2_stanford['deps'],
-                    'parse': tree_2                
+                    'parse': tree_2
                     },
                    'id':row[1]['id'],
                    'is_duplicate':row[1]['is_duplicate']
@@ -95,20 +86,20 @@ if __name__ == "__main__":
 
             tree_1.clear()
             tree_2.clear()
-        
-        except OSError: 
+
+        except OSError:
             fout.close()
             block_ctr += 1
-            fout = open('stanfordData_train' + block_ctr + '.nlp', 'wb') 
+            fout = gzip.open(sys.argv[2] + block_ctr + '.nlp', 'wb')
             pickle.dump(tmp, fout, protocol=pickle.HIGHEST_PROTOCOL)
             tree_1.clear()
             tree_2.clear()
-      
+
         except:
             print("Failure on row: %d" % count)
 
         count+=1
-    
+
     print("NLP Tree Generation completed!")
 
 
