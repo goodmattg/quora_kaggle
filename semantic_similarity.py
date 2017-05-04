@@ -1,10 +1,13 @@
 from collections import defaultdict
 import json
+from nltk.stem import PorterStemmer
+from nltk.corpus import stopwords
+stemmer = PorterStemmer()
 
 #S = 'Where is the puppy running to?'
 #T = 'Where is the dog running to?'
 # EQ = {} # This will be loaded as a json file, if we use it.
-# STOP = set(stopwords.words('english')) # I don't think we should remove these.
+#STOP = set(stopwords.words('english')) # I don't think we should remove these.
 
 # These should only load once.
 wn_n = json.load(open('WordNet/wn_synonyms_n.json'))
@@ -18,14 +21,10 @@ def align(S,T):
     A_E = {'i': defaultdict(set), 'j': defaultdict(set)} # Already aligned indices
     word_sim = create_word_sim(S,T)
     A = A.union(cwDepAlign(S,T,A_E,word_sim))
-    info_A = [(S[i]['word'],T[j]['word']) for (i,j) in A]
-    print info_A
+    #info_A = [(S[i]['word'],T[j]['word']) for (i,j) in A]
     A = A.union(cwTextAlign(S,T,A_E,word_sim))
-    info_A = [(S[i]['word'],T[j]['word']) for (i,j) in A]
-    print info_A
-    print S
-    print T
-    return A, info_A
+    #info_A = [(S[i]['word'],T[j]['word']) for (i,j) in A]
+    return A
 
 def cwDepAlign(S,T,A_E,word_sim):
     aligned_pairs_scores = set()
@@ -125,8 +124,8 @@ def textContext(S,T,i,j):
     right_i = i+3 if i+3 < len(S) else len(S) - 1
     left_j = j-3 if j-3 >= 0 else 0
     right_j = j+3 if j+3 < len(T) else len(T) - 1
-    C_i = [k for k in range(left_i,right_i + 1) if k != i ]
-    C_j = [l for l in range(left_j, right_j + 1) if l != j ]
+    C_i = [k for k in range(left_i,right_i + 1) if k != i]
+    C_j = [l for l in range(left_j, right_j + 1) if l != j]
     return [(k,l) for l in C_j for k in C_i] # Cross product
 
 # Index pairs that are similar. i,j are indices. S,T are tokenized sentence dictionaries.
@@ -146,7 +145,7 @@ def similarity(S,T,i,j):
         return 0
 
 def identical_words(S,T,i,j):
-    return S[i]['word'] == T[j]['word'] # May want to handle lemmatization later.
+    return S[i]['word'] == T[j]['word']
 
 def wn_synonyms(S,T,i,j):
     # Load based on pos tag
@@ -175,7 +174,6 @@ def ppdb_paraphrases(S,T,i,j):
     w_i = S[i]['word']
     w_j = T[j]['word']
     return w_j in ppdb_dict.get(w_i,[]) or w_i in ppdb_dict.get(w_j,[])
-
 
 
 #s_100 = [S for i in range(100)]
