@@ -28,7 +28,11 @@ def _getNLPToks_(rawSentence):
     }
 
 
-# ARGS: Path to data file, lambda, path to output
+# ARGS:
+# [1] Path to data file
+# [2] lambda
+# [3] SST_ON
+# [4] path to output
 
 if __name__ == "__main__":
     feature_vect = {}
@@ -41,7 +45,7 @@ if __name__ == "__main__":
             try:
                 unit = pickle.load(handle)
                 # ST Syntax score
-                (rscore_st, nscore_st) = tk._CollinsDuffy_(unit['q1']['parse'], unit['q2']['parse'], sys.argv[3], 1, 0)
+                (rscore_st, nscore_st) = tk._CollinsDuffy_(unit['q1']['parse'], unit['q2']['parse'], sys.argv[2], 1, sys.argv[3])
 
                 feature_vect[unit['id']] = {
                     'id':unit['id'],
@@ -51,32 +55,37 @@ if __name__ == "__main__":
             except EOFError:
                 break
             except:
-                print("Quote error on: %d", unit['id'])
+                
+                try:
+                    print("Quote error on: %d" % unit['id'])
 
-                q1_stanford = _getNLPToks_(unit['q1']['raw'].replace('"','').replace("'",''))
-                q2_stanford = _getNLPToks_(unit['q2']['raw'].replace('"','').replace("'",''))
+                    q1_stanford = _getNLPToks_(unit['q1']['raw'].replace('"','').replace("'",''))
+                    q2_stanford = _getNLPToks_(unit['q2']['raw'].replace('"','').replace("'",''))
 
-                tree_1 = tb.tree()
-                tree_2 = tb.tree()
+                    tree_1 = tb.tree()
+                    tree_2 = tb.tree()
 
-                # Generate a tree structure
-                tb._generateTree_(q1_stanford['parse'], tree_1)
-                tb._generateTree_(q2_stanford['parse'], tree_2)
+                    # Generate a tree structure
+                    tb._generateTree_(q1_stanford['parse'], tree_1)
+                    tb._generateTree_(q2_stanford['parse'], tree_2)
 
-                # Flip the trees
-                tb._flipTree_(tree_1)
-                tb._flipTree_(tree_2)
+                    # Flip the trees
+                    tb._flipTree_(tree_1)
+                    tb._flipTree_(tree_2)
 
+                    (rscore_st, nscore_st) = tk._CollinsDuffy_(tree_1, tree_2, sys.argv[2], 1, sys.argv[3])
 
-                (rscore_st, nscore_st) = tk._CollinsDuffy_(tree_1, tree_2, sys.argv[3], 1, 0)
+                    feature_vect[unit['id']] = {
+                        'id':unit['id'],
+                        'cdNorm_st':nscore_st
+                    }
 
-                feature_vect[unit['id']] = {
-                    'id':unit['id'],
-                    'cdNorm_st':nscore_st
-                }
-
-                print("Quote error resolved")
-                pass
+                    print("Quote error resolved")
+                    pass
+            
+                except:
+                    print("Unable to resolve: %d" % unit['id'])
+                
 
             count += 1
 
@@ -85,5 +94,5 @@ if __name__ == "__main__":
 
     df_feature[['id']] = df_feature[['id']].astype(int)
 
-    df_feature.to_csv(sys.argv[2], index=False)
+    df_feature.to_csv(sys.argv[4], index=False)
 
