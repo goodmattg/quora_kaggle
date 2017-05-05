@@ -50,7 +50,6 @@ def train_features():
                 S_unmatch_num_p, T_unmatch_num_p = percent_unmatched(S, T, A, 'CD', inferred_pos=False)
                 # NER Feature
                 S_unmatch_ner, T_unmatch_ner = ner_unmatched(S, T)
-                print(S_unmatch_ner, T_unmatch_ner)
                 # Length Difference Feature
                 len_dif = len_difference(S, T)
                 len_dif_p = len_difference_p(S, T)
@@ -166,5 +165,5 @@ def test_features():
 
 # Actually generate the feature csvs here.
 
-train_features()
-#test_features()
+#train_features()
+test_features()
