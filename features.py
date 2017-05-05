@@ -2,13 +2,15 @@ from semantic_similarity import infer_pos, similarity
 
 # Semantic similarity features.
 def percentage_semantic_similarity_one(S, A):
-    return float(len(A)) / len(S)
+    sim = float(len(A)) / len(S)
+    return sim if sim <= 1 else 1
 
 
 def percentage_semantic_similarity_both(S, T, A):
-    return 2.0 * len(A) / (len(S) + len(T))
+    sim = 2.0 * len(A) / (len(S) + len(T))
+    return sim if sim <= 1 else 1
 
-# Three features
+
 def percent_unmatched(S, T, A, pos, inferred_pos):
     S_num = num_pos(S, pos, inferred_pos)
     T_num = num_pos(T, pos, inferred_pos)
@@ -84,12 +86,15 @@ def len_difference_p(S, T):
 def len_difference(S, T):
     return abs(len(S) - len(T))
 
+# Cutoff at 3
 def ner_unmatched(S, T):
     S_ner = [S[i]['word'] for i in S if S[i]['ner'] != 'O']
     T_ner = [T[j]['word'] for j in T if T[j]['ner'] != 'O']
     S_words = [S[i]['word'] for i in S]
     T_words = [T[j]['word'] for j in T]
-    S_unmatch_ner = [w for w in S_ner if w not in T_words]
-    T_unmatch_ner = [w for w in T_ner if w not in S_words]
-    return len(S_unmatch_ner), len(T_unmatch_ner)
+    S_unmatch_ner = len([w for w in S_ner if w not in T_words])
+    S_unmatch_ner = S_unmatch_ner if S_unmatch_ner <= 3 else 3
+    T_unmatch_ner = len([w for w in T_ner if w not in S_words])
+    T_unmatch_ner = T_unmatch_ner if T_unmatch_ner <= 3 else 3
+    return S_unmatch_ner, T_unmatch_ner
 
