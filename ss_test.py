@@ -1,21 +1,41 @@
+import pickle
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from dependency_parse import get_pos_dep
 from semantic_similarity import align
 from features import percentage_semantic_similarity_both
 
-data = pd.read_csv("input/train.csv")
-X = data[['question1','question2']].values
-y = data['is_duplicate'].values
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
-
-X_sample = X_train[:10]
-for x in X_sample:
-    print x[0]
-    print x[1]
-    S = get_pos_dep(x[0])
-    T = get_pos_dep(x[1])
-    A, info_A = align(S,T)
-    p = percentage_semantic_similarity_both(S,T,A)
-    print 'Percentage Semantic Similarity: ', p
-    print '\n'
+with open('input/stanfordData_train1.nlp', 'rb') as handle:
+    count = 0
+    rows = []
+    while count < 200:
+        try:
+            d = pickle.load(handle)
+            id = d['id']
+            is_duplicate = d['is_duplicate']
+            #print(d['q1']['raw'])
+            #print(d['q2']['raw'])
+            S = get_pos_dep(d['q1']['toks'], d['q1']['deps'])
+            T = get_pos_dep(d['q2']['toks'], d['q2']['deps'])
+            A = align(S,T)
+            #print(A)
+            #print('Len(S):',len(S))
+            #print('Len(T):', len(T))
+            #print('Len(A):', len(A))
+            # Semantic Similarity Features
+            #S_sem_sim = percentage_semantic_similarity_one(S, A)
+            #T_sem_sim = percentage_semantic_similarity_one(T, A)
+            sem_sim = percentage_semantic_similarity_both(S, T, A)
+            # Put all features in a row
+            features_row = [id, sem_sim, is_duplicate]
+            rows.append(features_row)
+            count += 1
+            print(d['q1']['raw'])
+            print(S)
+            print(d['q2']['raw'])
+            print(T)
+            print('Similarity:', sem_sim)
+            print(d['is_duplicate'])
+            print('\n')
+        except EOFError:
+            break

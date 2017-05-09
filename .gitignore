@@ -8,6 +8,7 @@
 *.nlp
 *.pem
 ec2-user*
+*.DS_Store
 svm-light
 stanford-corenlp-full-2016-10-31
 additional_libs
