@@ -132,6 +132,9 @@ def textContext(S,T,i,j):
 def create_word_sim(S,T):
     return {(i,j): similarity(S,T,i,j) for j in range(len(T)) for i in range(len(S))}
 
+def dotproduct_word_sim(S,T):
+    return [similarity(S,T,i,i) for i in range(len(T))]
+
 # Words can pass the similarity check in 3 ways.
 def similarity(S,T,i,j):
     # Returns a value based on the type of match. Arbitrary for now.

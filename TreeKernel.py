@@ -3,11 +3,11 @@
 
 import numpy as np
 import math
+from nltk.corpus import wordnet as wn
 
 '''
 Helper Methods
 '''
-
 def _isLeaf_(tree, parentNode):
     return (len(tree[parentNode]['children']) == 0)
 
@@ -42,7 +42,7 @@ def _cdHelper_(tree1, tree2, node1, node2, store, lam, SST_ON):
             # Not pre-terminal. Recurse among the children of both token trees.
             else:
                 nChildren = len(tree1[node1]['children'])
-                
+
                 runningTotal = None
                 for idx in range(nChildren):
                      # index ->  node_id
@@ -55,7 +55,7 @@ def _cdHelper_(tree1, tree2, node1, node2, store, lam, SST_ON):
                         runningTotal = SST_ON + store[tmp_n1, tmp_n2]
                     else:
                         runningTotal *= (SST_ON + store[tmp_n1, tmp_n2])
-                    
+
                 store[node1, node2] = lam * runningTotal
                 return
         else:
